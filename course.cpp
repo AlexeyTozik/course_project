@@ -24,21 +24,11 @@ private:
     int role_;
 };
 
-// Определение структуры данных для автомобиля
-struct Car {
-    int type;
-    int passenger_capacity;
-    int fuel_consumption;
-    int cost;
-    int quantity;
-};
 
 // Определение класса DataManager
 class DataManager {
 public:
-    DataManager(const std::string& filename) : filename_(filename), file_open_(false) {
-        loadUsersFromFile();
-    }
+    DataManager(const std::string& filename) : filename_(filename), file_open_(false) {}
 
     bool createFile();
     bool openFile();
@@ -46,153 +36,11 @@ public:
 
     std::fstream& getFile() { return file_; }
 
-    // Добавленные методы для работы с пользователями
-    void loadUsersFromFile();
-    void saveUsersToFile();
-    void addUser(const User& user);
-    void editUser(size_t index, const User& newUser);
-    void deleteUser(size_t index);
-    const std::vector<User>& getUsers() const { return users_; }
-
-    void viewData();
-    void performTask(const std::string& task);
-    void searchData(const std::string& searchTerm);
-    void sortData(const std::string& sortBy);
-
 private:
     std::string filename_;
     std::fstream file_;
     bool file_open_;
-
-    // Добавлено поле для хранения списка пользователей
-    std::vector<User> users_;
-
-    // cars_ для хранения данных об автомобилях
-    std::vector<Car> cars_;
 };
-
-// Реализация методов для функциональности пользователя
-void DataManager::viewData() {
-    if (!file_open_) {
-        std::cerr << "File is not open. Please open the file first." << std::endl;
-        return;
-    }
-
-    file_.clear();
-    file_.seekg(0, std::ios::beg);
-    std::string line;
-    while (std::getline(file_, line)) {
-        std::cout << line << std::endl;
-    }
-}
-
-// Реализация методов для функциональности пользователя
-void DataManager::performTask(const std::string& task) {
-    if (task == "calculate_average_cost") {
-        double total_cost = 0;
-        int total_cars = 0;
-        for (const auto& car : cars_) {
-            total_cost += car.cost * car.quantity;
-            total_cars += car.quantity;
-        }
-        double average_cost = total_cost / total_cars;
-        std::cout << "Average cost of cars: " << average_cost << std::endl;
-    }
-    else {
-        std::cout << "Unknown task: " << task << std::endl;
-    }
-}
-
-void DataManager::searchData(const std::string& searchTerm) {
-    if (!file_open_) {
-        std::cerr << "File is not open. Please open the file first." << std::endl;
-        return;
-    }
-
-    file_.clear();
-    file_.seekg(0, std::ios::beg);
-    std::string line;
-    while (std::getline(file_, line)) {
-        if (line.find(searchTerm) != std::string::npos) {
-            std::cout << line << std::endl;
-        }
-    }
-}
-
-void DataManager::sortData(const std::string& sortBy) {
-    if (sortBy == "type") {
-        std::sort(cars_.begin(), cars_.end(), [](const Car& a, const Car& b) {
-            return a.type < b.type;
-            });
-    }
-    else if (sortBy == "passenger_capacity") {
-        std::sort(cars_.begin(), cars_.end(), [](const Car& a, const Car& b) {
-            return a.passenger_capacity < b.passenger_capacity;
-            });
-    }
-    else if (sortBy == "fuel_consumption") {
-        std::sort(cars_.begin(), cars_.end(), [](const Car& a, const Car& b) {
-            return a.fuel_consumption < b.fuel_consumption;
-            });
-    }
-    else if (sortBy == "cost") {
-        std::sort(cars_.begin(), cars_.end(), [](const Car& a, const Car& b) {
-            return a.cost < b.cost;
-            });
-    }
-    else if (sortBy == "quantity") {
-        std::sort(cars_.begin(), cars_.end(), [](const Car& a, const Car& b) {
-            return a.quantity < b.quantity;
-            });
-    }
-    else {
-        std::cout << "Unknown sort field: " << sortBy << std::endl;
-    }
-}
-
-void DataManager::loadUsersFromFile() {
-    std::ifstream file("users.txt");
-    if (file.is_open()) {
-        std::string line;
-        while (std::getline(file, line)) {
-            std::istringstream iss(line);
-            std::string login, password;
-            int role;
-            iss >> login >> password >> role;
-            users_.push_back(User(login, password, role));
-        }
-        file.close();
-    }
-}
-
-void DataManager::saveUsersToFile() {
-    std::ofstream file("users.txt");
-    if (file.is_open()) {
-        for (const auto& user : users_) {
-            file << user.getLogin() << " " << user.getPassword() << " " << user.getRole() << std::endl;
-        }
-        file.close();
-    }
-}
-
-void DataManager::addUser(const User& user) {
-    users_.push_back(user);
-    saveUsersToFile();
-}
-
-void DataManager::editUser(size_t index, const User& newUser) {
-    if (index < users_.size()) {
-        users_[index] = newUser;
-        saveUsersToFile();
-    }
-}
-
-void DataManager::deleteUser(size_t index) {
-    if (index < users_.size()) {
-        users_.erase(users_.begin() + index);
-        saveUsersToFile();
-    }
-}
 
 bool DataManager::createFile() {
     if (file_open_) {
@@ -279,21 +127,17 @@ User* authorize(const std::string& login, const std::string& password) {
     return nullptr;
 }
 
-
 class Vehicle {
 public:
     enum class Type { Taxi, Minibus, Limousine };
-
     Vehicle(Type type, int capacity, double fuel_consumption, double cost, int quantity)
         : type_(type), capacity_(capacity), fuel_consumption_(fuel_consumption),
         cost_(cost), quantity_(quantity) {}
-
     Type get_type() const { return type_; }
     int get_capacity() const { return capacity_; }
     double get_fuel_consumption() const { return fuel_consumption_; }
     double get_cost() const { return cost_; }
     int get_quantity() const { return quantity_; }
-
 private:
     Type type_;
     int capacity_;
@@ -306,7 +150,6 @@ private:
 class Menu {
 public:
     Menu(User* user) : user_(user) {}
-
     void display() {
         if (user_->getRole() == 1) {
             displayAdminMenu();
@@ -365,7 +208,6 @@ void calculate_cost_by_type(const std::vector<Vehicle>& vehicles) {
         int type_index = static_cast<int>(vehicle.get_type());
         costs[type_index] += vehicle.get_cost() * vehicle.get_quantity();
     }
-
     std::cout << "Стоимость автомобилей каждого вида:\n";
     std::cout << "Такси: " << costs[0] << std::endl;
     std::cout << "Микроавтобусы: " << costs[1] << std::endl;
@@ -378,7 +220,6 @@ void select_vehicles_by_capacity(const std::vector<Vehicle>& vehicles) {
     std::cin >> min_capacity;
     std::cout << "Введите максимальную вместимость: ";
     std::cin >> max_capacity;
-
     std::cout << "Автомобили с заданной вместимостью:\n";
     for (const auto& vehicle : vehicles) {
         if (vehicle.get_capacity() >= min_capacity && vehicle.get_capacity() <= max_capacity) {
@@ -399,19 +240,15 @@ void select_vehicles_by_capacity(const std::vector<Vehicle>& vehicles) {
     }
 }
 
-
 void load_vehicles(std::vector<Vehicle>& vehicles, const std::string& filename) {
     std::ifstream file(filename);
-
     if (file.is_open()) {
         vehicles.clear();
         int type, capacity, quantity;
         double fuel_consumption, cost;
-
         while (file >> type >> capacity >> fuel_consumption >> cost >> quantity) {
             vehicles.emplace_back(static_cast<Vehicle::Type>(type), capacity, fuel_consumption, cost, quantity);
         }
-
         file.close();
     }
     else {
@@ -421,7 +258,6 @@ void load_vehicles(std::vector<Vehicle>& vehicles, const std::string& filename) 
 
 void save_vehicles(const std::vector<Vehicle>& vehicles, const std::string& filename) {
     std::ofstream file(filename);
-
     if (file.is_open()) {
         for (const auto& vehicle : vehicles) {
             file << static_cast<int>(vehicle.get_type()) << ' '
@@ -430,7 +266,6 @@ void save_vehicles(const std::vector<Vehicle>& vehicles, const std::string& file
                 << vehicle.get_cost() << ' '
                 << vehicle.get_quantity() << std::endl;
         }
-
         file.close();
     }
     else {
@@ -441,7 +276,6 @@ void save_vehicles(const std::vector<Vehicle>& vehicles, const std::string& file
 void add_vehicle(std::vector<Vehicle>& vehicles) {
     int type, capacity, quantity;
     double fuel_consumption, cost;
-
     std::cout << "Введите вид автомобиля (0 - Такси, 1 - Микроавтобус, 2 - Лимузин): ";
     std::cin >> type;
     std::cout << "Введите вместимость: ";
@@ -452,10 +286,8 @@ void add_vehicle(std::vector<Vehicle>& vehicles) {
     std::cin >> cost;
     std::cout << "Введите количество автомобилей данного вида: ";
     std::cin >> quantity;
-
     vehicles.emplace_back(static_cast<Vehicle::Type>(type), capacity, fuel_consumption, cost, quantity);
 }
-
 
 int main() {
     SetConsoleCP(1251);
@@ -480,7 +312,6 @@ int main() {
     }
     // Создаем объект класса Menu, передавая авторизованного пользователя
     Menu menu(user);
-
     std::vector<Vehicle> vehicles;
     const std::string filename = "cars.txt";
 
@@ -490,7 +321,6 @@ int main() {
         // Отображаем соответствующее меню, в зависимости от роли пользователя
         menu.display();
         int choice = menu.get_choice();
-
         // Если пользователь является администратором (роль 1)
         if (user->getRole() == 1) {
             // Обработка действий администратора
@@ -546,7 +376,3 @@ int main() {
 
     return 0;
 }
-
-
-   
-
