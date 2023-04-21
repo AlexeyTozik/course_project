@@ -1,2 +1,1 @@
-﻿  course.cpp
-  course.vcxproj -> C:\Users\la_tozik\source\repos\course\x64\Debug\course.exe
+﻿LINK : fatal error LNK1168: не удается открыть C:\Users\la_tozik\source\repos\course\x64\Debug\course.exe для записи

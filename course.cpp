@@ -87,10 +87,6 @@ bool DataManager::deleteFile() {
     return true;
 }
 
-
-
-
-
 std::vector<std::string> split(const std::string& str, char delimiter) {
     std::vector<std::string> tokens;
     std::stringstream ss(str);
@@ -289,6 +285,159 @@ void add_vehicle(std::vector<Vehicle>& vehicles) {
     vehicles.emplace_back(static_cast<Vehicle::Type>(type), capacity, fuel_consumption, cost, quantity);
 }
 
+// Добавьте новую функцию `add_account`
+void add_account(const std::string& users_filename) {
+    std::string login, password;
+    int role;
+    std::cout << "Введите логин: ";
+    std::cin >> login;
+    std::cout << "Введите пароль: ";
+    std::cin >> password;
+    std::cout << "Введите роль (0 - Пользователь, 1 - Администратор): ";
+    std::cin >> role;
+
+    DataManager userManager(users_filename);
+    if (!userManager.openFile()) {
+        std::cerr << "Error opening users file." << std::endl;
+        return;
+    }
+
+    userManager.getFile() << login << ";" << password << ";" << role << "\n" << std::endl;
+    userManager.getFile().close();
+    std::cout << "Учетная запись успешно добавлена." << std::endl;
+}
+
+
+// Добавьте новую функцию `remove_account`
+void remove_account(const std::string& users_filename) {
+    std::string login_to_remove;
+    std::cout << "Введите логин удаляемой учетной записи: ";
+    std::cin >> login_to_remove;
+
+    DataManager userManager(users_filename);
+    if (!userManager.openFile()) {
+        std::cerr << "Error opening users file." << std::endl;
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+    while (std::getline(userManager.getFile(), line)) {
+        std::vector<std::string> tokens = split(line, ';');
+        if (tokens.size() != 3) {
+            continue;
+        }
+        if (tokens[0] != login_to_remove) {
+            lines.push_back(line);
+        }
+    }
+
+    userManager.getFile().close();
+    userManager.deleteFile();
+    userManager.createFile();
+    userManager.openFile();
+
+    for (const auto& line_to_write : lines) {
+        userManager.getFile() << line_to_write << std::endl;
+    }
+
+    userManager.getFile().close();
+    std::cout << "Учетная запись успешно удалена." << std::endl;
+}
+
+// Добавьте новую функцию `modify_account`
+void modify_account(const std::string& users_filename) {
+    std::string login_to_modify;
+    std::cout << "Введите логин изменяемой учетной записи: ";
+    std::cin >> login_to_modify;
+
+    std::string new_login, new_password;
+    int new_role;
+    std::cout << "Введите новый логин: ";
+    std::cin >> new_login;
+    std::cout << "Введите новый пароль: ";
+    std::cin >> new_password;
+    std::cout << "Введите новую роль (0 - Пользователь, 1 - Администратор): ";
+    std::cin >> new_role;
+    
+    DataManager userManager(users_filename);
+    if (!userManager.openFile()) {
+        std::cerr << "Error opening users file." << std::endl;
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+    bool account_found = false;
+    while (std::getline(userManager.getFile(), line)) {
+        std::vector<std::string> tokens = split(line, ';');
+        if (tokens.size() != 3) {
+            continue;
+        }
+        if (tokens[0] == login_to_modify) {
+            lines.push_back(new_login + ";" + new_password + ";" + std::to_string(new_role));
+            account_found = true;
+        }
+        else {
+            lines.push_back(line);
+        }
+    }
+
+    userManager.getFile().close();
+    userManager.deleteFile();
+    userManager.createFile();
+    userManager.openFile();
+
+    for (const auto& line_to_write : lines) {
+        userManager.getFile() << line_to_write << std::endl;
+    }
+
+    userManager.getFile().close();
+
+    if (account_found) {
+        std::cout << "Учетная запись успешно изменена." << std::endl;
+    }
+    else {
+        std::cout << "Учетная запись не найдена." << std::endl;
+    }
+}
+
+
+// Добавьте функцию manage_accounts
+void manage_accounts(const std::string& users_filename) {
+    while (true) {
+        std::cout << "===================================================================\n";
+        std::cout << "1. Добавить учетную запись\n"
+            << "2. Удалить учетную запись\n"
+            << "3. Изменить учетную запись\n"
+            << "4. Вернуться в главное меню\n"
+            << "Введите номер действия: ";
+        std::cout << "===================================================================\n";
+
+            int choice;
+        std::cin >> choice;
+
+        switch (choice) {
+        case 1:
+            add_account(users_filename);
+            break;
+        case 2:
+            remove_account(users_filename);
+            break;
+        case 3:
+            modify_account(users_filename);
+            break;
+        case 4:
+            return;
+        default:
+            std::cout << "Некорректный выбор. Попробуйте снова.\n";
+        }
+    }
+}
+
+ 
+
+
 int main() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
@@ -339,8 +488,7 @@ int main() {
                 select_vehicles_by_capacity(vehicles);
                 break;
             case 5:
-                // Вызовите функции для работы с учетными записями, например:
-               // manage_accounts();
+                manage_accounts(users_filename);
                 break;
             case 6:
                 std::cout << "Выход...\n";
