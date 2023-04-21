@@ -129,11 +129,21 @@ public:
     Vehicle(Type type, int capacity, double fuel_consumption, double cost, int quantity)
         : type_(type), capacity_(capacity), fuel_consumption_(fuel_consumption),
         cost_(cost), quantity_(quantity) {}
+
     Type get_type() const { return type_; }
     int get_capacity() const { return capacity_; }
     double get_fuel_consumption() const { return fuel_consumption_; }
     double get_cost() const { return cost_; }
     int get_quantity() const { return quantity_; }
+
+    void print() const {
+        std::cout << "Тип: " << static_cast<int>(type_) << ", "
+            << "Вместимость: " << capacity_ << ", "
+            << "Расход бензина: " << fuel_consumption_ << ", "
+            << "Стоимость: " << cost_ << ", "
+            << "Количество: " << quantity_ << std::endl;
+    }
+
 private:
     Type type_;
     int capacity_;
@@ -141,6 +151,7 @@ private:
     double cost_;
     int quantity_;
 };
+
 
 
 class Menu {
@@ -173,18 +184,29 @@ private:
         std::cout << "3. Подсчитать общую стоимость автомобилей каждого вида\n";
         std::cout << "4. Подобрать автомобили по заданной вместимости\n";
         std::cout << "5. Работа с учетными записями\n";
-        std::cout << "6. Выход\n";
+        std::cout << "6. Показать все данные\n";
+        std::cout << "7. Сортировать по типу\n";
+        std::cout << "8. Сортировать по вместимости\n";
+        std::cout << "9. Сортировать по расходу топлива\n";
+        std::cout << "10. Сортировать по стоимости\n";
+        std::cout << "11. Сортировать по количеству\n";
+        std::cout << "12. Выход\n";
         std::cout << "===================================================================\n";
     }
 
     void displayUserMenu() {
         std::cout << "\n";
         std::cout << "========================= Меню пользователя ========================\n";
-        std::cout << "1. Добавить автомобиль\n";
-        std::cout << "2. Подсчитать общую стоимость таксопарка\n";
-        std::cout << "3. Подсчитать общую стоимость автомобилей каждого вида\n";
-        std::cout << "4. Подобрать автомобили по заданной вместимости\n";
-        std::cout << "5. Выход\n";
+        std::cout << "1. Подсчитать общую стоимость таксопарка\n";
+        std::cout << "2. Подсчитать общую стоимость автомобилей каждого вида\n";
+        std::cout << "3. Подобрать автомобили по заданной вместимости\n";
+        std::cout << "4. Показать все данные\n";
+        std::cout << "5. Сортировать по типу\n";
+        std::cout << "6. Сортировать по вместимости\n";
+        std::cout << "7. Сортировать по расходу топлива\n";
+        std::cout << "8. Сортировать по стоимости\n";
+        std::cout << "9. Сортировать по количеству\n";
+        std::cout << "10. Выход\n";
         std::cout << "===================================================================\n";
     }
 };
@@ -302,7 +324,7 @@ void add_account(const std::string& users_filename) {
         return;
     }
 
-    userManager.getFile() << login << ";" << password << ";" << role << "\n" << std::endl;
+    userManager.getFile() << login << ";" << password << ";" << role << std::endl;
     userManager.getFile().close();
     std::cout << "Учетная запись успешно добавлена." << std::endl;
 }
@@ -403,16 +425,16 @@ void modify_account(const std::string& users_filename) {
 }
 
 
-// Добавьте функцию manage_accounts
+// функцию manage_accounts
 void manage_accounts(const std::string& users_filename) {
     while (true) {
         std::cout << "===================================================================\n";
         std::cout << "1. Добавить учетную запись\n"
             << "2. Удалить учетную запись\n"
             << "3. Изменить учетную запись\n"
-            << "4. Вернуться в главное меню\n"
-            << "Введите номер действия: ";
+            << "4. Вернуться в главное меню\n";
         std::cout << "===================================================================\n";
+        std::cout << "Введите номер действия: ";
 
             int choice;
         std::cin >> choice;
@@ -435,7 +457,42 @@ void manage_accounts(const std::string& users_filename) {
     }
 }
 
- 
+void display_all_vehicles(const std::vector<Vehicle>& vehicles) {
+    std::cout << "Все автомобили:\n";
+    for (const auto& vehicle : vehicles) {
+        vehicle.print();
+    }
+}
+
+void sort_by_type(std::vector<Vehicle>& vehicles) {
+    std::sort(vehicles.begin(), vehicles.end(), [](const Vehicle& a, const Vehicle& b) {
+        return a.get_type() < b.get_type();
+        });
+}
+
+void sort_by_capacity(std::vector<Vehicle>& vehicles) {
+    std::sort(vehicles.begin(), vehicles.end(), [](const Vehicle& a, const Vehicle& b) {
+        return a.get_capacity() < b.get_capacity();
+        });
+}
+
+void sort_by_fuel_consumption(std::vector<Vehicle>& vehicles) {
+    std::sort(vehicles.begin(), vehicles.end(), [](const Vehicle& a, const Vehicle& b) {
+        return a.get_fuel_consumption() < b.get_fuel_consumption();
+        });
+}
+
+void sort_by_cost(std::vector<Vehicle>& vehicles) {
+    std::sort(vehicles.begin(), vehicles.end(), [](const Vehicle& a, const Vehicle& b) {
+        return a.get_cost() < b.get_cost();
+        });
+}
+
+void sort_by_vehicle_count(std::vector<Vehicle>& vehicles) {
+    std::sort(vehicles.begin(), vehicles.end(), [](const Vehicle& a, const Vehicle& b) {
+        return a.get_quantity() < b.get_quantity();
+        });
+}
 
 
 int main() {
@@ -449,7 +506,6 @@ int main() {
     std::cin >> login;
     std::cout << "Введите пароль: ";
     std::cin >> password;
-
 
     // Авторизация пользователя
     const std::string users_filename = "users.txt";
@@ -491,6 +547,29 @@ int main() {
                 manage_accounts(users_filename);
                 break;
             case 6:
+                display_all_vehicles(vehicles);
+                break;
+            case 7:
+                sort_by_type(vehicles);
+                display_all_vehicles(vehicles);
+                break;
+            case 8:
+                sort_by_capacity(vehicles);
+                display_all_vehicles(vehicles);
+                break;
+            case 9:
+                sort_by_fuel_consumption(vehicles);
+                display_all_vehicles(vehicles);
+                break;
+            case 10:
+                sort_by_cost(vehicles);
+                display_all_vehicles(vehicles);
+                break;
+            case 11:
+                sort_by_vehicle_count(vehicles);
+                display_all_vehicles(vehicles);
+                break;
+            case 12:
                 std::cout << "Выход...\n";
                 return 0;
             default:
@@ -501,19 +580,15 @@ int main() {
             // Обработка действий пользователя (не администратора)
             switch (choice) {
             case 1:
-                add_vehicle(vehicles);
-                save_vehicles(vehicles, filename);
-                break;
-            case 2:
                 calculate_total_cost(vehicles);
                 break;
-            case 3:
+            case 2:
                 calculate_cost_by_type(vehicles);
                 break;
-            case 4:
+            case 3:
                 select_vehicles_by_capacity(vehicles);
                 break;
-            case 5:
+            case 4:
                 std::cout << "Выход...\n";
                 return 0;
             default:

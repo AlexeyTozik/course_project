@@ -1,2 +1,0 @@
-admin;admin;1
-user1;user;0
